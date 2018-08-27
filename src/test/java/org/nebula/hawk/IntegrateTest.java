@@ -26,7 +26,6 @@ public class IntegrateTest {
                 LOGGER.info(String.format("Try port %d\n", port));
             }
         }
-
         new Thread(server::start).start();
         Thread.sleep(1000);
     }
