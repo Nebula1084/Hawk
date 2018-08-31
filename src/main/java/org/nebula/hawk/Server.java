@@ -1,5 +1,8 @@
 package org.nebula.hawk;
 
+import org.nebula.hawk.broker.Command;
+import org.nebula.hawk.broker.CommandFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -58,28 +61,30 @@ public class Server {
 
     private void handleRead(SelectionKey key) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
-        StringBuilder stringBuilder = new StringBuilder();
         buffer.clear();
+        Command command;
 
         int read;
         while ((read = channel.read(buffer)) > 0) {
             buffer.flip();
-            byte[] bytes = new byte[buffer.limit()];
-            buffer.get(bytes);
-            stringBuilder.append(new String(bytes));
+            command = CommandFactory.create(buffer);
+            if (command != null) {
+                LOGGER.info(command.toString());
+            }
             buffer.clear();
         }
 
         if (read < 0) {
             LOGGER.info("Socket is closed");
             channel.close();
-        } else {
-            LOGGER.info(stringBuilder.toString());
         }
 
-        buffer.clear();
-        ByteBuffer response = ByteBuffer.wrap("Server response\n".getBytes());
-        channel.write(response);
+        if (channel.isOpen()) {
+            buffer.clear();
+            ByteBuffer response = ByteBuffer.wrap("Server response\n".getBytes());
+            channel.write(response);
+        }
+
     }
 
     public static void main(String[] args) throws IOException {

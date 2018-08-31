@@ -31,9 +31,14 @@ public class IntegrateTest {
     }
 
     @Test(timeout = 5000)
-    public void testSubscribe() throws IOException {
+    public void testSubscribe() throws IOException, InterruptedException {
         Client client = new Client("localhost", port);
-        client.subscribe(null, null);
-
+        client.subscribe("BLACK DESERT", null);
+        Thread.sleep(1000);
+        client.close();
     }
+
+
+
+
 }
