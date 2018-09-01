@@ -3,6 +3,12 @@ package org.nebula.hawk.buffer;
 import java.nio.channels.SocketChannel;
 
 public class DynamicByteBuf implements ByteBuf {
+    private BufferManager bufferManager;
+
+    DynamicByteBuf(BufferManager bufferManager) {
+        this.bufferManager = bufferManager;
+    }
+
     @Override
     public ByteBuf get(byte[] dst) {
         return this;
