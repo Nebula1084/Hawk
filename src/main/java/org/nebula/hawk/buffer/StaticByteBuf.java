@@ -18,6 +18,11 @@ public class StaticByteBuf implements ByteBuf {
         mode = WRITE;
     }
 
+    StaticByteBuf(int size) {
+        buffer = ByteBuffer.allocate(size);
+        mode = WRITE;
+    }
+
     private void checkRemainingAndCompact(int size) {
         if (buffer.remaining() < size)
             buffer.compact();
