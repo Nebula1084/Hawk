@@ -14,8 +14,7 @@ public class StaticByteBuf implements ByteBuf {
     private boolean endOfStream;
 
     StaticByteBuf() {
-        buffer = ByteBuffer.allocate(BUFFER_SIZE);
-        mode = WRITE;
+        this(BUFFER_SIZE);
     }
 
     StaticByteBuf(int size) {
