@@ -35,6 +35,23 @@ public class StaticByteBuf implements ByteBuf {
     }
 
     @Override
+    public ByteBuf mark() {
+        buffer.mark();
+        return this;
+    }
+
+    @Override
+    public ByteBuf reset() {
+        buffer.reset();
+        return this;
+    }
+
+    @Override
+    public int remaining() {
+        return buffer.remaining();
+    }
+
+    @Override
     public ByteBuf get(byte[] dst) {
         checkModeAndFlip(READ);
         buffer.get(dst);

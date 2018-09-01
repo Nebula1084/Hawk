@@ -10,6 +10,21 @@ public class DynamicByteBuf implements ByteBuf {
     }
 
     @Override
+    public ByteBuf mark() {
+        return this;
+    }
+
+    @Override
+    public ByteBuf reset() {
+        return this;
+    }
+
+    @Override
+    public int remaining() {
+        return 0;
+    }
+
+    @Override
     public ByteBuf get(byte[] dst) {
         return this;
     }

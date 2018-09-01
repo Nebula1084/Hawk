@@ -5,6 +5,12 @@ import java.nio.channels.SocketChannel;
 
 public interface ByteBuf {
 
+    ByteBuf mark();
+
+    ByteBuf reset();
+
+    int remaining();
+
     ByteBuf get(byte[] dst);
 
     ByteBuf put(byte[] src);
