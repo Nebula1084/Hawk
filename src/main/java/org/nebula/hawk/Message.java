@@ -1,13 +1,13 @@
 package org.nebula.hawk;
 
-import java.nio.ByteBuffer;
+import org.nebula.hawk.buffer.ByteBuf;
 
 public abstract class Message {
     public Message() {
     }
 
-    public Message(ByteBuffer in) {
+    public Message(ByteBuf in) {
     }
 
-    public abstract void encode(ByteBuffer out);
+    public abstract void encode(ByteBuf out);
 }

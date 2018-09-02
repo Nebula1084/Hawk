@@ -1,6 +1,7 @@
 package org.nebula.hawk;
 
-import java.nio.ByteBuffer;
+import org.nebula.hawk.buffer.ByteBuf;
+
 import java.util.Arrays;
 
 public class Varchar extends Message {
@@ -13,14 +14,15 @@ public class Varchar extends Message {
         this.length = this.characters.length;
     }
 
-    public Varchar(ByteBuffer in) {
+    public Varchar(ByteBuf in) {
         super(in);
         this.length = in.getInt();
         characters = new byte[this.length];
         in.get(characters);
     }
 
-    public void encode(ByteBuffer out){
+    @Override
+    public void encode(ByteBuf out) {
         out.putInt(this.length);
         out.put(this.characters);
     }

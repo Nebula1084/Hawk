@@ -3,8 +3,10 @@ package org.nebula.hawk.buffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.logging.Logger;
 
 public class StaticByteBuf implements ByteBuf {
+    private final static Logger LOGGER = Logger.getLogger(StaticByteBuf.class.getName());
     private static final int BUFFER_SIZE = 8 * 1024 * 1024;
     private static final int READ = 0;
     private static final int WRITE = 1;

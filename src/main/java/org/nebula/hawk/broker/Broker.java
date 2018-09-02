@@ -2,39 +2,36 @@ package org.nebula.hawk.broker;
 
 import org.nebula.hawk.Message;
 import org.nebula.hawk.Varchar;
+import org.nebula.hawk.channel.Encoder;
+import org.nebula.hawk.channel.Socket;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.SelectionKey;
 import java.util.*;
 
 public class Broker {
-    private Map<Varchar, List<SocketChannel>> subscriptionList;
-    private static final int BUFFER_SIZE = 8 * 1024 * 1024;
-    private ByteBuffer buffer;
+    private Map<Varchar, List<SelectionKey>> subscriptionList;
 
     public Broker() {
         subscriptionList = new HashMap<>();
-        buffer = ByteBuffer.allocate(BUFFER_SIZE);
     }
 
-    public void subscribe(Varchar topic, SocketChannel channel) {
-        List<SocketChannel> channelList = subscriptionList.computeIfAbsent(topic, k -> new LinkedList<>());
-        channelList.add(channel);
+    public void subscribe(Varchar topic, SelectionKey key) {
+        List<SelectionKey> channelList = subscriptionList.computeIfAbsent(topic, k -> new LinkedList<>());
+        channelList.add(key);
     }
 
-    public void publish(Varchar topic, Message message) throws IOException {
-        List<SocketChannel> channelList = subscriptionList.getOrDefault(topic, new LinkedList<>());
-        Iterator<SocketChannel> channelIterator = channelList.iterator();
-        buffer.clear();
-        message.encode(buffer);
+    public void publish(Varchar topic, Message message, Encoder encoder) {
+        List<SelectionKey> channelList = subscriptionList.getOrDefault(topic, new LinkedList<>());
+        Iterator<SelectionKey> channelIterator = channelList.iterator();
         while (channelIterator.hasNext()) {
-            SocketChannel channel = channelIterator.next();
-            if (channel.isConnected()) {
-                channel.write(buffer);
-            } else {
+            SelectionKey key = channelIterator.next();
+            if (!key.isValid()) {
                 channelIterator.remove();
+                continue;
             }
+            Socket socket = (Socket) key.attachment();
+            encoder.encode(message, socket.outboundBuffer);
+            key.interestOps(SelectionKey.OP_WRITE);
         }
     }
 
