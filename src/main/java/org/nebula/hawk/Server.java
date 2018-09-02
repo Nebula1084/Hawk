@@ -5,8 +5,8 @@ import org.nebula.hawk.broker.CommandEncoder;
 import org.nebula.hawk.broker.CommandHandler;
 import org.nebula.hawk.channel.Decoder;
 import org.nebula.hawk.channel.Encoder;
-import org.nebula.hawk.channel.EventLoop;
 import org.nebula.hawk.channel.Handler;
+import org.nebula.hawk.channel.ServerEventLoop;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -14,14 +14,14 @@ import java.util.logging.Logger;
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(Server.class.getName());
 
-    private EventLoop eventLoop;
+    private ServerEventLoop eventLoop;
 
     Server(int port) throws IOException {
 
         Decoder decoder = new CommandDecoder();
         Encoder encoder = new CommandEncoder();
         Handler handler = new CommandHandler();
-        eventLoop = new EventLoop(decoder, encoder, handler);
+        eventLoop = new ServerEventLoop(decoder, encoder, handler);
         eventLoop.bind(port);
     }
 

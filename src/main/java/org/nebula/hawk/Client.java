@@ -1,50 +1,55 @@
 package org.nebula.hawk;
 
+import org.nebula.hawk.broker.CommandDecoder;
+import org.nebula.hawk.broker.CommandEncoder;
 import org.nebula.hawk.broker.Publication;
 import org.nebula.hawk.broker.Subscription;
-import org.nebula.hawk.buffer.BufferManager;
-import org.nebula.hawk.buffer.ByteBuf;
-import org.nebula.hawk.buffer.StaticBufferManager;
+import org.nebula.hawk.channel.ClientEventLoop;
+import org.nebula.hawk.channel.Decoder;
+import org.nebula.hawk.channel.Encoder;
+import org.nebula.hawk.channel.Handler;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.SelectionKey;
 import java.util.logging.Logger;
 
 public class Client {
-    private static final int BUFFER_SIZE = 8 * 1024 * 1024;
-    private ByteBuf buffer;
-    private BufferManager bufferManager;
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
+    private ClientEventLoop eventLoop;
 
     interface Listener {
         void handle(Message message);
     }
 
-    private SocketChannel socketChannel;
+    class MessageHandler implements Handler {
+
+        @Override
+        public void handle(Message message, SelectionKey key, Encoder encoder) {
+            LOGGER.info(message.toString());
+        }
+    }
 
 
     public Client(String host, int port) throws IOException {
-        InetSocketAddress address = new InetSocketAddress(host, port);
-        this.socketChannel = SocketChannel.open(address);
-        bufferManager = new StaticBufferManager();
-        buffer = bufferManager.create();
-
+        Decoder decoder = new CommandDecoder();
+        Encoder encoder = new CommandEncoder();
+        Handler handler = new MessageHandler();
+        eventLoop = new ClientEventLoop(decoder, encoder, handler);
+        eventLoop.connect(host, port);
+        new Thread(eventLoop).start();
     }
 
     public void subscribe(String topic, Listener listener) throws IOException {
         Subscription subscription = new Subscription(topic);
-        subscription.encode(buffer);
-        buffer.write(socketChannel);
+        eventLoop.send(subscription);
     }
 
     public void publish(String topic, String content) throws IOException {
         Publication publication = new Publication(topic, content);
-        publication.encode(buffer);
-        buffer.write(socketChannel);
+        eventLoop.send(publication);
     }
 
-    public void close() throws IOException {
-        this.socketChannel.close();
+    public void shutdown() throws IOException {
+        eventLoop.shutdown();
     }
 }

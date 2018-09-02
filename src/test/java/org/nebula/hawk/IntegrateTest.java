@@ -35,7 +35,8 @@ public class IntegrateTest {
         Client client = new Client("localhost", port);
         client.subscribe("BLACK DESERT", null);
         Thread.sleep(1000);
-        client.close();
+        client.shutdown();
+        LOGGER.info("shutdown");
     }
 
 
