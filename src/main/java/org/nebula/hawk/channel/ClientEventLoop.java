@@ -48,7 +48,7 @@ public class ClientEventLoop extends EventLoop {
             hasMessage = true;
         }
         if (hasMessage)
-            selectionKey.interestOps(SelectionKey.OP_WRITE);
+            selectionKey.interestOps(selectionKey.interestOps() | SelectionKey.OP_WRITE);
     }
 
     public void send(Message message) {

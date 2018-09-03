@@ -31,7 +31,7 @@ public class Broker {
             }
             Socket socket = (Socket) key.attachment();
             encoder.encode(message, socket.outboundBuffer);
-            key.interestOps(SelectionKey.OP_WRITE);
+            key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
         }
     }
 
