@@ -3,46 +3,62 @@ package org.nebula.hawk.buffer;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
-public interface ByteBuf {
+public abstract class ByteBuf {
 
-    ByteBuf mark();
+    protected static final int READ = 0;
+    protected static final int WRITE = 1;
 
-    ByteBuf reset();
+    protected int mode;
 
-    int remaining();
 
-    ByteBuf get(byte[] dst);
+    public void readMode() {
+        checkModeAndFlip(READ);
+    }
 
-    ByteBuf put(byte[] src);
+    public void writeMode() {
+        checkModeAndFlip(WRITE);
+    }
 
-    char getChar();
+    abstract protected void checkModeAndFlip(int mode);
 
-    ByteBuf putChar(char value);
+    abstract public ByteBuf mark();
 
-    short getShort();
+    abstract public ByteBuf reset();
 
-    ByteBuf putShort(short value);
+    abstract public int remaining();
 
-    int getInt();
+    abstract public ByteBuf get(byte[] dst);
 
-    ByteBuf putInt(int value);
+    abstract public ByteBuf put(byte[] src);
 
-    long getLong();
+    abstract public char getChar();
 
-    ByteBuf putLong(long value);
+    abstract public ByteBuf putChar(char value);
 
-    float getFloat();
+    abstract public short getShort();
 
-    ByteBuf putFloat(float value);
+    abstract public ByteBuf putShort(short value);
 
-    double getDouble();
+    abstract public int getInt();
 
-    ByteBuf putDouble(double value);
+    abstract public ByteBuf putInt(int value);
 
-    int read(SocketChannel channel) throws IOException;
+    abstract public long getLong();
 
-    boolean endOfStream();
+    abstract public ByteBuf putLong(long value);
 
-    int write(SocketChannel channel) throws IOException;
+    abstract public float getFloat();
+
+    abstract public ByteBuf putFloat(float value);
+
+    abstract public double getDouble();
+
+    abstract public ByteBuf putDouble(double value);
+
+    abstract public int read(SocketChannel channel) throws IOException;
+
+    abstract public boolean endOfStream();
+
+    abstract public int write(SocketChannel channel) throws IOException;
 
 }

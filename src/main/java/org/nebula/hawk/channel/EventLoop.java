@@ -61,8 +61,10 @@ public abstract class EventLoop implements Runnable {
     protected void handleRead(SelectionKey key) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
         Socket socket = (Socket) key.attachment();
+        socket.inboundBuffer.writeMode();
         socket.inboundBuffer.read(channel);
         Message message;
+        socket.inboundBuffer.readMode();
         while ((message = decoder.decode(socket.inboundBuffer)) != null) {
             handler.handle(message, key, encoder);
         }
@@ -71,6 +73,7 @@ public abstract class EventLoop implements Runnable {
     protected void handleWrite(SelectionKey key) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
         Socket socket = (Socket) key.attachment();
+        socket.outboundBuffer.readMode();
         socket.outboundBuffer.write(channel);
         key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
     }

@@ -5,14 +5,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Logger;
 
-public class StaticByteBuf implements ByteBuf {
+public class StaticByteBuf extends ByteBuf {
     private final static Logger LOGGER = Logger.getLogger(StaticByteBuf.class.getName());
     private static final int BUFFER_SIZE = 8 * 1024 * 1024;
-    private static final int READ = 0;
-    private static final int WRITE = 1;
 
     private ByteBuffer buffer;
-    private int mode;
     private boolean endOfStream;
 
     StaticByteBuf() {
@@ -29,7 +26,8 @@ public class StaticByteBuf implements ByteBuf {
             buffer.compact();
     }
 
-    private void checkModeAndFlip(int mode) {
+    @Override
+    protected void checkModeAndFlip(int mode) {
         if (this.mode != mode) {
             this.mode = mode;
             buffer.flip();
@@ -55,14 +53,12 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public ByteBuf get(byte[] dst) {
-        checkModeAndFlip(READ);
         buffer.get(dst);
         return this;
     }
 
     @Override
     public ByteBuf put(byte[] src) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(src.length);
         buffer.put(src);
         return this;
@@ -76,7 +72,6 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public ByteBuf putChar(char value) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(2);
         buffer.putChar(value);
         return this;
@@ -84,13 +79,11 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public short getShort() {
-        checkModeAndFlip(READ);
         return buffer.getShort();
     }
 
     @Override
     public ByteBuf putShort(short value) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(2);
         buffer.putShort(value);
         return this;
@@ -104,7 +97,6 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public ByteBuf putInt(int value) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(4);
         buffer.putInt(value);
         return this;
@@ -112,13 +104,11 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public long getLong() {
-        checkModeAndFlip(READ);
         return buffer.getLong();
     }
 
     @Override
     public ByteBuf putLong(long value) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(8);
         buffer.putLong(value);
         return this;
@@ -126,13 +116,11 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public float getFloat() {
-        this.checkModeAndFlip(READ);
         return buffer.getFloat();
     }
 
     @Override
     public ByteBuf putFloat(float value) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(4);
         buffer.putFloat(value);
         return this;
@@ -140,13 +128,11 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public double getDouble() {
-        checkModeAndFlip(READ);
         return buffer.getDouble();
     }
 
     @Override
     public ByteBuf putDouble(double value) {
-        checkModeAndFlip(WRITE);
         checkRemainingAndCompact(8);
         buffer.putDouble(value);
         return this;
@@ -154,7 +140,6 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public int read(SocketChannel channel) throws IOException {
-        this.checkModeAndFlip(WRITE);
         endOfStream = false;
         int bytesRead = channel.read(buffer);
         int totalBytesRead = bytesRead;
@@ -177,7 +162,6 @@ public class StaticByteBuf implements ByteBuf {
 
     @Override
     public int write(SocketChannel channel) throws IOException {
-        this.checkModeAndFlip(READ);
         int bytesWritten = channel.write(buffer);
         int totalBytesWritten = bytesWritten;
         while (bytesWritten > 0 && buffer.hasRemaining()) {

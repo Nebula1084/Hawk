@@ -41,8 +41,8 @@ public class ClientEventLoop extends EventLoop {
     protected void beforeProcessKey() {
         Message message;
         Socket socket = (Socket) selectionKey.attachment();
-        LOGGER.info("here");
         boolean hasMessage = false;
+        socket.outboundBuffer.writeMode();
         while ((message = queue.poll()) != null) {
             encoder.encode(message, socket.outboundBuffer);
             hasMessage = true;

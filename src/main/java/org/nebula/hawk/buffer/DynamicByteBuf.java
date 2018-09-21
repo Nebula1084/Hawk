@@ -2,11 +2,16 @@ package org.nebula.hawk.buffer;
 
 import java.nio.channels.SocketChannel;
 
-public class DynamicByteBuf implements ByteBuf {
+public class DynamicByteBuf extends ByteBuf {
     private BufferManager bufferManager;
 
     DynamicByteBuf(BufferManager bufferManager) {
         this.bufferManager = bufferManager;
+    }
+
+    @Override
+    protected void checkModeAndFlip(int mode) {
+
     }
 
     @Override

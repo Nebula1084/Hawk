@@ -27,6 +27,10 @@ public class Varchar extends Message {
         out.put(this.characters);
     }
 
+    public int size() {
+        return characters.length + 4;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return this == obj;

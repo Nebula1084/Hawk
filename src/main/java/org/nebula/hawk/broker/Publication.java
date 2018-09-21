@@ -25,6 +25,7 @@ public class Publication extends Message implements Command {
 
     @Override
     public void encode(ByteBuf out) {
+        out.putInt(4 + topic.size() + content.size());
         out.putInt(PUBLICATION);
         topic.encode(out);
         content.encode(out);
