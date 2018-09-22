@@ -31,9 +31,17 @@ public class Publication extends Message implements Command {
         content.encode(out);
     }
 
+    public Varchar topic() {
+        return topic;
+    }
+
+    public Varchar content() {
+        return content;
+    }
+
     @Override
     public void execute(Broker broker, SelectionKey key, Encoder encoder) {
-        broker.publish(topic, content, encoder);
+        broker.publish(this, encoder);
     }
 
     @Override

@@ -33,7 +33,11 @@ public class Varchar extends Message {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj;
+        if (obj instanceof Varchar) {
+            Varchar that = (Varchar) obj;
+            return this.length == that.length && Arrays.equals(this.characters, that.characters);
+        } else
+            return false;
     }
 
     @Override

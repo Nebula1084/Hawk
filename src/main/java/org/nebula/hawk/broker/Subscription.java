@@ -24,9 +24,12 @@ public class Subscription extends Message implements Command {
     public void encode(ByteBuf out) {
         out.putInt(4 + topic.size());
         out.putInt(SUBSCRIPTION);
-        this.topic.encode(out);
+        topic.encode(out);
     }
 
+    public Varchar topic() {
+        return topic;
+    }
 
     @Override
     public String toString() {

@@ -32,7 +32,7 @@ public abstract class EventLoop implements Runnable {
         try {
             while (channel.isOpen()) {
                 beforeProcessKey();
-                selector.select();
+                selector.selectNow();
                 Iterator<SelectionKey> keyIterator = this.selector.selectedKeys().iterator();
                 while (keyIterator.hasNext()) {
                     SelectionKey key = keyIterator.next();
@@ -65,6 +65,7 @@ public abstract class EventLoop implements Runnable {
         socket.inboundBuffer.read(channel);
         Message message;
         socket.inboundBuffer.readMode();
+        socket.outboundBuffer.writeMode();
         while ((message = decoder.decode(socket.inboundBuffer)) != null) {
             handler.handle(message, key, encoder);
         }
@@ -75,7 +76,8 @@ public abstract class EventLoop implements Runnable {
         Socket socket = (Socket) key.attachment();
         socket.outboundBuffer.readMode();
         socket.outboundBuffer.write(channel);
-        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+        if (socket.outboundBuffer.remaining() == 0)
+            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
     }
 
     public void shutdown() throws IOException {

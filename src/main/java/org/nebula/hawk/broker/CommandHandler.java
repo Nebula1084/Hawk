@@ -19,6 +19,5 @@ public class CommandHandler implements Handler {
     public void handle(Message message, SelectionKey key, Encoder encoder) {
         Command command = (Command) message;
         command.execute(broker, key, encoder);
-        LOGGER.info(command.toString());
     }
 }
